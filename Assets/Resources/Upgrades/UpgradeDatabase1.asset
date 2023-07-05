@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4558659feadd4fc4cb99ff46df3d3d05, type: 3}
+  m_Name: UpgradeDatabase1
+  m_EditorClassIdentifier: 
+  upgradeStat:
+  - {fileID: 11400000, guid: 8c9f8e2160081c64aab9c9387bbcdbd9, type: 2}
+  - {fileID: 11400000, guid: aa54e6d38cf4df84991c99a2947a045b, type: 2}
+  - {fileID: 11400000, guid: 81d51bb5a8dd75848bbe7b78568297f6, type: 2}
+  - {fileID: 11400000, guid: 0ceebc1d89f3dc4488497275445a6730, type: 2}
+  - {fileID: 11400000, guid: ecb6a4613d58ca84ab2d8e97b33d16cb, type: 2}

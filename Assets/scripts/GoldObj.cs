@@ -7,7 +7,7 @@ public class GoldObj : MonoBehaviour
     private GameLogic gameLogic;
     private void Awake()
     {
-        gameLogic =GameObject.Find("GameLogic").GetComponent<GameLogic>();
+        gameLogic = GameObject.Find("GameLogic").GetComponent<GameLogic>();
 
     }
     private void OnTriggerEnter2D(Collider2D collision)
