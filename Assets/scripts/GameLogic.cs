@@ -89,7 +89,11 @@ public class GameLogic : MonoBehaviour
     }
     public void ButtonQuit()
     {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
         Application.Quit();
+        
     }
     public void ButtonStart()
     {
