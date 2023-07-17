@@ -115,10 +115,11 @@ public class Ground : MonoBehaviour
         int SpawnChance = Random.Range(1, 100);
         if (SpawnChance < 20 && player.currDistance > 0 && GameLogic.TimeBetwenShootingResp <= 0)
         {
+            int SpawnPositionY = Random.Range(9, 23);
 #pragma warning disable UNT0019
             GameObject CreatedShoter = Instantiate(Shooter.gameObject);
 #pragma warning restore UNT0019
-            CreatedShoter.transform.position = new Vector2(screenRight, 10);
+            CreatedShoter.transform.position = new Vector2(screenRight-0.5f, SpawnPositionY);
             GameLogic.TimeBetwenShootingResp = 2;
         }
     }

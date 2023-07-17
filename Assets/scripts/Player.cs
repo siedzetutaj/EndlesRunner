@@ -10,16 +10,17 @@ public class Player : MonoBehaviour
 {
     
     //Movement staff
-    private readonly float groundMaxXVelocity = 20;
-    private readonly float groundMaxAcceleration = 1.5f;
+    private const float groundMaxXVelocity = 20;
+    private const float groundMaxAcceleration = 1.5f;
     private float groundAcceleration = 1;
     private Vector2 velocity;
     private Vector2 move;
-    private readonly float speed = 8;
+    private const float speed = 8;
     private Rigidbody2D rb;
     private Vector2 pos;
     public float currDistance;
     //Staff To Jump
+    public const float rayDistance=1.9f;
     public LayerMask groundLayerMask;
     [SerializeField]
     private float jetVelocity = 0.3f;
@@ -28,12 +29,12 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float maxHoldJetTime = 1.5f;
     private float Gravity;
-    public float jumpImpulse;
+    public float jumpImpulse = 1.5f;
     //gameLogic Staff
     private int PlayerHealth=3;
     private GameLogic gameLogic;
     private bool BeingInvincible=false;
-    private readonly float InvincibilityTimer=0.5f;
+    private const float InvincibilityTimer=0.5f;
     private float InvincibilityTime=0;
     private bool GodMode;
 
@@ -43,13 +44,14 @@ public class Player : MonoBehaviour
     public bool UpgradeTimeSlow = false;
     public bool UpgradeMaxhealth = false;
     public bool UpgradeGun = false;
-    
-
+    //animations
+    private Animator animator;
 
     void Start()
     {
         
         Time.timeScale = 1;
+        animator=this.GetComponent<Animator>();
         gameLogic =GameObject.Find("GameLogic").GetComponent<GameLogic>();
         gameLogic.MaxFuelAmount = maxHoldJetTime;
         rb = GetComponent<Rigidbody2D>();
@@ -61,12 +63,32 @@ public class Player : MonoBehaviour
     {
         gameLogic.health = PlayerHealth;
         move.x = Input.GetAxis("Horizontal");
+        if (move.x < 0) this.transform.localScale = new Vector3(-1, 1, 1);
+        else if (move.x > 0) this.transform.localScale = new Vector3(1, 1, 1);
+
+        animator.SetFloat("Speed", System.Math.Abs(move.x));
         Jump();
         Fall();
         //do wywalenia potem
         ActiveUpgradeManager();
         Invincibility();
         if (Input.GetKeyDown(KeyCode.G)) GodMode = !GodMode;
+
+        if (isGrounded)
+        {
+            //if (Input.GetKey(KeyCode.S))
+            //{
+            //    animator.SetBool("IsCrouching", true);
+            //    this.GetComponent<BoxCollider2D>().offset = new Vector2(0, -0.7957449f);
+            //    this.GetComponent<BoxCollider2D>().size = new Vector2(1, 2);
+            //}
+            //else 
+            //{
+            //    animator.SetBool("IsCrouching", false);
+            //    this.GetComponent<BoxCollider2D>().offset = new Vector2(0, -0.3084784f);
+            //    this.GetComponent<BoxCollider2D>().size = new Vector2(1, 3);
+            //}
+        }
     }
     private void FixedUpdate()
     {
@@ -95,11 +117,11 @@ public class Player : MonoBehaviour
         if(InvincibilityTime > 0)
         {
             InvincibilityTime-=Time.deltaTime;
-            this.gameObject.GetComponent<SpriteRenderer>().color = new Color(0.4f,0.7f,0.35f,0.5f)  ;
+            this.gameObject.GetComponent<SpriteRenderer>().color = new Color(1,1,1,0.5f)  ;
         }
         else
         {
-            this.gameObject.GetComponent<SpriteRenderer>().color = new Color(0.4f, 0.7f, 0.35f, 1);
+            this.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
             BeingInvincible =false;
         }
         
@@ -110,22 +132,31 @@ public class Player : MonoBehaviour
         
         if ( Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.Space))
         {
+            
             if (isGrounded)
             {
                 rb.AddForce(Vector2.up * jumpImpulse, ForceMode2D.Impulse);
                 isGrounded = false;
+                animator.SetBool("IsJumping", true);
+                animator.SetBool("IsFalling", false);
             }
 
-            if (holdJetTimer > 0 && !isGrounded) 
+            if (holdJetTimer > 0.01 && !isGrounded) 
             {
                 rb.AddForce(Vector2.up * jetVelocity,ForceMode2D.Impulse);
                 holdJetTimer -= Time.deltaTime;
+                animator.SetBool("IsJumping", true);
+                animator.SetBool("IsFalling", false);
             }
+            
         }else if( Input.GetKeyUp(KeyCode.W)||Input.GetKeyUp(KeyCode.Space)) 
         {
             if (holdJetTimer < maxHoldJetTime)
                 holdJetTimer += Time.deltaTime / 2;
             else holdJetTimer = maxHoldJetTime;
+
+            animator.SetBool("IsJumping", false);
+            animator.SetBool("IsFalling", true);
         }
         gameLogic.FuelAmount= holdJetTimer;
         //if ( Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.Space))
@@ -155,7 +186,6 @@ public class Player : MonoBehaviour
         Vector2 rayOrigin = new Vector2(pos.x - 0.1f, pos.y);
 #pragma warning restore IDE0090
         Vector2 rayDirection = Vector2.down;
-        float rayDistance = 0.7f;
         RaycastHit2D hit2D = Physics2D.Raycast(rayOrigin, rayDirection, rayDistance, groundLayerMask);
         if (hit2D.collider != null)
         {
@@ -163,11 +193,26 @@ public class Player : MonoBehaviour
             if (maxHoldJetTime > holdJetTimer)
                 holdJetTimer += Time.deltaTime * 1.2f;
             else holdJetTimer = maxHoldJetTime;
-     
+            animator.SetBool("IsJumping", false);
+            animator.SetBool("IsFalling", false);
+            BoxCollider2D collider2D = this.GetComponent<BoxCollider2D>();
+            if(Input.GetKey(KeyCode.S)) 
+            { 
+                animator.SetBool("IsCrouching", true);
+                collider2D.offset = new Vector2(0, -1.25f);
+                collider2D.size = new Vector2(1, 1);
+            }
+            else
+            {
+                animator.SetBool("IsCrouching", false);
+                collider2D.offset = new Vector2(0, -0.35f);
+                collider2D.size = new Vector2(1, 2.8f);
+            }
         }
         if (hit2D.collider==null) { 
         
             isGrounded=false;
+
         }
         Debug.DrawRay(rayOrigin, rayDirection * rayDistance, Color.red);
     }
